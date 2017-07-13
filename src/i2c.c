@@ -63,6 +63,35 @@ mrb_esp32_i2c_send(mrb_state *mrb, mrb_value self) {
     return mrb_fixnum_value(err);
 }
 
+static mrb_value
+mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
+{
+    mrb_value data, port;
+    mrb_int addr, size;
+    i2c_cmd_handle_t cmd;
+    esp_err_t err;
+
+    if (size == 0) {
+        return mrb_str_new_cstr(mrb, '');
+    }
+
+    mrb_get_args(mrb, "Sii", &data, &size, &addr);
+    port = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port"));
+
+    cmd = i2c_cmd_link_create();
+    i2c_master_start(cmd);
+    i2c_master_write_byte(cmd, (addr << 1 ) | I2C_MASTER_READ, 1);
+    if (size > 1) {
+      i2c_master_read(cmd, RSTRING_PTR(data), size - 1, 1);
+    }
+    i2c_master_read_byte(cmd, RSTRING_PTR(data) + size - 1, 1);
+    i2c_master_stop(cmd);
+    err = i2c_master_cmd_begin(mrb_fixnum(port), cmd, 1000 / portTICK_RATE_MS);
+    i2c_cmd_link_delete(cmd);
+
+    return mrb_str_new_cstr(mrb, data);
+}
+
 void
 mrb_mruby_esp32_i2c_gem_init(mrb_state* mrb)
 {
@@ -74,6 +103,7 @@ mrb_mruby_esp32_i2c_gem_init(mrb_state* mrb)
   mrb_define_method(mrb, i2c, "_init", mrb_esp32_i2c_init, MRB_ARGS_REQ(7));
   mrb_define_method(mrb, i2c, "deinit", mrb_esp32_i2c_deinit, MRB_ARGS_NONE());
   mrb_define_method(mrb, i2c, "send", mrb_esp32_i2c_send, MRB_ARGS_REQ(2));
+  mrb_define_method(mrb, i2c, "receive", mrb_esp32_i2c_receive, MRB_ARGS_REQ(3));
 
   constants = mrb_define_module_under(mrb, i2c, "Constants");
 
