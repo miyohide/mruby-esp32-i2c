@@ -72,10 +72,6 @@ mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
     i2c_cmd_handle_t cmd;
     esp_err_t err;
 
-    if (size == 0) {
-        return mrb_nil_value();
-    }
-
     if (mrb_nil_p(data)) {
         data = mrb_str_new(mrb, NULL, size);
     }
@@ -84,6 +80,11 @@ mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
     }
 
     mrb_get_args(mrb, "ii", &size, &addr);
+
+    if (size == 0) {
+        return mrb_nil_value();
+    }
+
     port = mrb_iv_get(mrb, self, mrb_intern_lit(mrb, "@port"));
 
     cmd = i2c_cmd_link_create();
