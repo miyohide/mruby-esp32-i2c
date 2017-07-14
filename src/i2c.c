@@ -97,7 +97,7 @@ mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
     err = i2c_master_cmd_begin(mrb_fixnum(port), cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
 
-    return mrb_str_new_cstr(mrb, data);
+    return data;
 }
 
 void
