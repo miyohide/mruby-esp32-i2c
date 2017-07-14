@@ -72,14 +72,14 @@ mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
     i2c_cmd_handle_t cmd;
     esp_err_t err;
 
+    mrb_get_args(mrb, "ii", &size, &addr);
+
     if (mrb_nil_p(data)) {
         data = mrb_str_new(mrb, NULL, size);
     }
     if (RSTRING_LEN(data) != size) {
         data = mrb_str_resize(mrb, data, size);
     }
-
-    mrb_get_args(mrb, "ii", &size, &addr);
 
     if (size == 0) {
         return mrb_nil_value();
