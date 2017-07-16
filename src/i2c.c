@@ -90,10 +90,14 @@ mrb_esp32_i2c_receive(mrb_state *mrb, mrb_value self)
     cmd = i2c_cmd_link_create();
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (addr << 1 ) | I2C_MASTER_READ, 1);
+/*
     if (size > 1) {
       i2c_master_read(cmd, RSTRING_PTR(data), size - 1, 0);
     }
     i2c_master_read_byte(cmd, RSTRING_PTR(data) + size - 1, 1);
+*/
+    i2c_master_read(cmd, RSTRING_PTR(data), size, 0);
+
     i2c_master_stop(cmd);
     err = i2c_master_cmd_begin(mrb_fixnum(port), cmd, 1000 / portTICK_RATE_MS);
     i2c_cmd_link_delete(cmd);
