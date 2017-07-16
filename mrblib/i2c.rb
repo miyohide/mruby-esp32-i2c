@@ -11,7 +11,7 @@ module ESP32
     end
     def init(mode=MASTER)
       raise ArgumentError.new unless [MASTER,SLAVE].include?(mode)
-      raise NotImplementedError.new unless mode.eql?(MASTER)
+      #raise NotImplementedError.new unless mode.eql?(MASTER)
       @mode = mode
       _init(@port, @mode, @scl, @scl_pullup, @sda, @sda_pullup, @freq)
     end
